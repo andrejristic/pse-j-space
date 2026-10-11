@@ -1,0 +1,1 @@
+<div class="msg {{ m.role }}">{% if m.role == 'user' %}{{ m.text }}{% else %}{% for kind, val in render(m.text) %}{% if kind == 'panel' %}<button class="panelbtn" hx-get="{{ val }}" hx-target="#work">otvori {{ val.split('/')[-1] or 'panel' }}</button>{% else %}{{ val }}{% endif %}{% endfor %}{% endif %}</div>

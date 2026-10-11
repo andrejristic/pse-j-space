@@ -1,0 +1,30 @@
+<header class="whead">
+  <h2>Pošta</h2>
+  <p class="muted small">Ono što sistem ne sme da odluči sam stiže ovde, ne kao iskačući prozor. Pročitano ostaje zapisano.</p>
+</header>
+<section class="card">
+  <strong>Aktivne jedinice</strong>
+  {% for a in active %}
+    <div class="row small"><span class="tag">{{ {'l1_sweep':'spektar','qdiff':'poređenje','l2_lens':'lens','l3_sae':'rečnik','l4_jspace':'J-prostor'}.get(a.kind, a.kind) }}</span>
+      <span>{{ a.model }}</span><span class="muted">{{ a.step }}/{{ a.total }} · {{ a.label }}</span>
+      <svg viewBox="0 0 36 36" width="22" height="22" aria-label="preostali budžet"><circle cx="18" cy="18" r="15" class="ring"/>
+        <circle cx="18" cy="18" r="15" class="ringv" stroke-dasharray="{{ (94.2 * (1 - a.step/a.total))|round(1) }} 94.2" transform="rotate(-90 18 18)"/></svg>
+    </div>
+  {% else %}<p class="muted small">Nema aktivnih jedinica.</p>{% endfor %}
+</section>
+{% for it in items %}
+<section class="card {{ 'seen' if it.seen else '' }}">
+  <div class="row"><span class="tag">{{ it.kind }}</span><span class="muted small">{{ it.model }} · {{ pg.run_kind_label(it.run_kind) }}</span></div>
+  <p>{{ it.text }}</p>
+  {% if not it.seen %}<form method="post" action="/inbox/{{ it.item_id }}/seen"><button>Pročitano</button></form>{% endif %}
+</section>
+{% else %}
+<p class="muted">Pošta je prazna.</p>
+{% endfor %}
+{% if deaths %}
+<section class="card">
+  <strong>Run-ovi koji nisu primljeni u znanje</strong>
+  <p class="muted small">Nisu u dosijeima — rezultat pre pečata nije rezultat.</p>
+  {% for d in deaths %}<div class="small"><code>{{ d[0] }}</code> · {{ d[1] }}</div>{% endfor %}
+</section>
+{% endif %}

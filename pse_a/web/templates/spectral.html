@@ -1,0 +1,29 @@
+<header class="whead">
+  <h2>Spektralna mapa</h2>
+  <p class="muted small">{{ rep.model }} · {{ rep.architecture }} · {{ rep.n_layers }} slojeva · d_model {{ rep.d_model }}
+   {% if not rep.kquant_clean %} · <span class="warn">dimenzija nije deljiva sa 256 — prečke se razlikuju po sastavu tipova</span>{% endif %}</p>
+  <p class="small">{% for k, v in regimes.items() %}<span class="tag">{{ pg.regime_label(k) }}: {{ v }}</span> {% endfor %}</p>
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+<div class="legend small"><span class="sw" style="background:var(--trained)"></span> alfa ≈ 2 (izražena struktura)
+  <span class="sw" style="background:var(--randomlike)"></span> alfa ≈ 8 (bliže slučajnom)
+  <span class="sw" style="background:var(--na)"></span> alfa se ne računa za ovaj režim</div>
+<div class="gridwrap">
+<table class="heat">
+  <thead><tr><th>sloj</th>{% for r in roles %}<th>{{ r }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for L, row in grid.items() %}
+    <tr><th>{{ L }}</th>
+    {% for r in roles %}{% set m = row.get(r) %}
+      {% if m %}
+      <td style="background:{{ svg.alpha_color(m.alpha) }}"
+          hx-get="/run/{{ run_id }}/esd/{{ m.name }}" hx-target="#detail"
+          title="{{ m.name }} · {{ pg.regime_label(m.regime) }} · alfa {{ fmt(m.alpha) }} · {{ m.ggml_type }}">
+        {{ fmt(m.alpha, 1) if isfinite(m.alpha) else '·' }}</td>
+      {% else %}<td class="empty"></td>{% endif %}
+    {% endfor %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<section id="detail" class="card"><p class="muted small">Klikni ćeliju za raspodelu sopstvenih vrednosti.</p></section>

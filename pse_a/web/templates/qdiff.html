@@ -1,0 +1,25 @@
+<header class="whead">
+  <h2>Poređenje preciznosti</h2>
+  <p class="muted small">{{ rep.ref }} → {{ rep.test }} · referenca je uvek viša preciznost</p>
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+<section class="card">
+  <strong>Koliko dominantnog podprostora ostaje, po dubini spektra</strong>
+  <p class="muted small">Prosek po slojevima jedne uloge. 1.000 = pravci netaknuti.</p>
+  {{ chart|safe }}
+</section>
+<section class="card">
+  <strong>Po ulozi i paru tipova</strong>
+  <p class="muted small">Poređenje ide unutar uloge: u K_M mešavinama shema je vezana za ulogu, pa zbir preko uloga meša dve stvari.</p>
+  <div class="gridwrap"><table class="plain">
+    <thead><tr><th>uloga</th><th>tipovi</th><th>n</th><th>zadržano (m/4)</th><th>koncentracija šuma</th><th>promena energije</th><th>pomak šumnog poda <span class="muted small">(samo gde MP važi)</span></th><th>pomak alfa</th></tr></thead>
+    <tbody>
+    {% for k, v in rep.strata.items() %}{% set p = k.split('|') %}
+      <tr><td>{{ p[0] }}</td><td class="nw"><code>{{ p[1]|replace('->',' → ') }}</code></td><td>{{ v.n }}</td>
+          <td>{{ fmt(v.kept_quarter, 4) }}</td>
+          <td>{{ fmt(v.noise_ratio) }}{% if v.noise_ratio > 1.2 %} <span class="muted small">gađa naučene pravce</span>{% endif %}</td>
+          <td>{{ fmt(v.energy_change, 3, True) }}</td><td>{{ fmt(v.sigma2_shift, 2, True) }} <span class="muted small">{{ v.mp_ok if v.mp_ok is defined else '?' }}/{{ v.n }}</span></td>
+          <td>{{ fmt(v.alpha_shift) }}</td></tr>
+    {% endfor %}
+    </tbody></table></div>
+</section>

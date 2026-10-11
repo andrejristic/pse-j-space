@@ -1,0 +1,55 @@
+<header class="whead">
+  <h2>{{ name }}</h2>
+  <p class="muted small">Dosije · <code>{{ mh[:16] }}</code> · rezultati se ne menjaju; ispravka je nov run</p>
+</header>
+{% if card %}
+<section class="card">
+  <strong>Karta modela</strong>
+  <dl class="kv small">
+    <dt>arhitektura</dt><dd>{{ card.arch }} · {{ card.n_layers }} slojeva · d_model {{ card.d_model }} · d_ff {{ card.d_ff }}</dd>
+    <dt>parametara</dt><dd>{{ '%.2f'|format(card.n_params/1e9) }} milijardi</dd>
+    <dt>sastav tipova</dt><dd>{% for k, f in card.types %}<span class="tag">{{ k }} {{ (100*f)|round(1) }} %</span> {% endfor %}</dd>
+    {% if not card.kquant_clean %}<dt></dt><dd class="warn">dimenzije nisu deljive sa 256 — kvantizovane verzije se razlikuju po sastavu</dd>{% endif %}
+    <dt>na ovoj mašini</dt><dd>{% for k, ok in card.layers.items() %}<span class="tag" style="{{ '' if ok else 'opacity:.45;text-decoration:line-through' }}">{{ k }}</span> {% endfor %}
+      {% if card.why %}<span class="muted"> — {{ card.why }}</span>{% endif %}</dd>
+    {% if card.l1_s %}<dt>spektralna mapa je trajala</dt><dd>{{ (card.l1_s/60)|round(1) }} min</dd>{% endif %}
+  </dl>
+</section>
+{% endif %}
+{% for r in runs %}
+<section class="card">
+  <div class="row">
+    <strong>{{ {'l1_sweep':'Spektralna mapa (L1)','qdiff':'Poređenje preciznosti','l2_lens':'Misao po slojevima (L2)','l4_jspace':'Mapa J-prostora (L4)','l3_sae':'Rečnik pojmova (L3)','ppl_ladder':'Spektar i ponašanje'}.get(r.kind, r.kind) }}</strong>
+    <span class="muted small">run <code>{{ r.run_id }}</code> · {{ r.n_registry }} nalaza u znanju</span>
+    {% if r.supersedes %}<span class="tag">zamenjuje {{ r.supersedes }}</span>{% endif %}
+  </div>
+  <div class="row gap">
+    {% if r.kind == 'l1_sweep' %}
+      <button hx-get="/run/{{ r.run_id }}/spectral" hx-target="#work">Otvori mapu</button>
+    {% elif r.kind == 'qdiff' %}
+      <button hx-get="/run/{{ r.run_id }}/qdiff" hx-target="#work">Otvori poređenje</button>
+    {% elif r.kind == 'l2_lens' %}
+      <button hx-get="/run/{{ r.run_id }}/lens" hx-target="#work">Otvori</button>
+    {% elif r.kind == 'ppl_ladder' %}
+      <button hx-get="/run/{{ r.run_id }}/ppl" hx-target="#work">Otvori</button>
+    {% elif r.kind == 'l3_sae' %}
+      <button hx-get="/run/{{ r.run_id }}/sae" hx-target="#work">Otvori rečnik</button>
+    {% elif r.kind == 'l4_jspace' %}
+      <button hx-get="/run/{{ r.run_id }}/jspace" hx-target="#work">Otvori mapu</button>
+    {% endif %}
+    {% for name, h in r.artifacts.items() %}
+      <a class="art" href="/artifact/{{ h }}" target="_blank" title="{{ h }}">{{ name }} <code>{{ h[:8] }}</code></a>
+    {% endfor %}
+  </div>
+  {% if r.notes %}
+  <ul class="notes">{% for n in r.notes %}<li><span class="muted small">{{ n.author }}:</span> {{ n.text }}</li>{% endfor %}</ul>
+  {% endif %}
+  <form method="post" action="/run/{{ r.run_id }}/note" class="noteform">
+    <input type="hidden" name="anchor" value="{{ r.artifacts.values()|list|first }}">
+    <input name="text" placeholder="Beleška uz ovaj rezultat — dodaje se, ne menja" maxlength="4000">
+    <button>Dodaj</button>
+  </form>
+</section>
+{% else %}
+<p class="muted">Nema zapečaćenih run-ova za ovaj model.</p>
+{% endfor %}

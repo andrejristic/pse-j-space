@@ -1,0 +1,15 @@
+<div class="row"><strong>{{ m.name }}</strong><span class="tag">{{ pg.regime_label(m.regime) }}</span><span class="tag">{{ m.ggml_type }}</span></div>
+{{ chart|safe }}
+<p class="muted small">Logaritamska osa. Crvena kriva: Marchenko-Pastur za bulk (šum iste varijanse), skalirana na udeo bulk-a.</p>
+{% if m.mp_fit_ok is defined and not m.mp_fit_ok %}
+<p class="warn small">Bulk ove matrice nije Marchenko-Pastur (slaganje {{ fmt(m.mp_ks_n) }}, granica 1.36). Ivica i σ² su ovde samo referentna tačka — ne šumni pod, i ono desno od ivice nije „rep" u užem smislu. Merodavna je alfa.</p>
+{% elif m.mp_fit_ok is defined %}
+<p class="muted small">Bulk prati MP (slaganje {{ fmt(m.mp_ks_n) }}, granica 1.36): σ² jeste šumni pod, a ono desno od ivice je naučena struktura.</p>
+{% endif %}
+<dl class="kv small">
+  <dt>alfa</dt><dd>{{ fmt(m.alpha) }} {% if isfinite(m.alpha_lo) %}<span class="muted">[{{ fmt(m.alpha_lo) }}, {{ fmt(m.alpha_hi) }}]</span>{% endif %}</dd>
+  <dt>rep iznad MP ivice</dt><dd>{{ m.n_tail }} ({{ fmt(100*m.tail_frac, 1) }} %)</dd>
+  <dt>σ² {% if m.mp_fit_ok is defined and not m.mp_fit_ok %}(referentna tačka){% else %}(šumni pod){% endif %}</dt><dd>{{ '%.3e'|format(m.sigma2) }} <span class="muted">{{ m.sigma_method }}</span></dd>
+  <dt>stabilni rang</dt><dd>{{ fmt(m.stable_rank, 1) }}</dd>
+  <dt>oblik · q</dt><dd>{{ m.shape[0] }}×{{ m.shape[1] }} · {{ fmt(m.q, 3) }}</dd>
+</dl>

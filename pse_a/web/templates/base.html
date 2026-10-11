@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PSE-A</title>
+<link rel="stylesheet" href="/static/app.css">
+<script src="/vendor/htmx.min.js"></script>
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" aria-label="Modeli">
+    <h1>PSE-A</h1>
+    <p class="muted small">Dosijei — samo zapečaćeni rezultati</p>
+    <a href="#" class="inboxlink" hx-get="/inbox" hx-target="#work">Pošta <span id="unseen" class="badge" {% if not unseen %}hidden{% endif %}>{{ unseen }}</span></a>
+    <ul class="models">
+    {% for m in models %}
+      <li><a href="#" hx-get="/model/{{ m.hash }}" hx-target="#work" hx-push-url="false"
+             class="{% if loop.first %}on{% endif %}">
+        <span class="mname">{{ m.name }}</span>
+        <span class="muted small">{{ m.arch }} · {{ m.sealed }} {{ 'run' if m.sealed == 1 else 'run-a' }}</span>
+      </a></li>
+    {% else %}
+      <li class="muted">Još nema zapečaćenih rezultata. Pokreni <code>pse-a l1 &lt;model.gguf&gt;</code>.</li>
+    {% endfor %}
+    </ul>
+  </nav>
+
+  <main id="work" class="work" {% if start %}hx-get="{{ start }}" hx-trigger="load"{% endif %}>
+    <p class="muted">Izaberi model levo.</p>
+  </main>
+
+  <aside class="talk" id="talk" aria-label="Razgovor" hx-get="/talk" hx-trigger="load">
+    <h2>Razgovor</h2>
+  </aside>
+
+  <footer class="status">
+    <span id="units" class="units muted">nema aktivnih jedinica</span>
+    <canvas id="ecg" width="220" height="26" aria-label="theta aktivne jedinice"></canvas>
+    <span id="shield" class="shield {{ shield.level }}" title="{{ shield.text }}">◆</span>
+  </footer>
+</div>
+</body>
+</html>

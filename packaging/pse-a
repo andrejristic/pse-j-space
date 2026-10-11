@@ -1,0 +1,29 @@
+#!/bin/sh
+# pse-a -- omotac. Paket ne sadrzi nijedan kompajliran bajt (Architecture: all);
+# numpy/scipy stizu kao wheel-ovi na ciljnoj masini i sami se prilagode CPU-u.
+set -e
+LIB="${PSE_A_LIB:-/usr/lib/pse-a}"
+VENV="${PSE_A_VENV:-$HOME/.local/share/pse-a/venv}"
+REQ="$LIB/requirements.txt"
+STAMP="$VENV/.pse-a-requirements"
+
+if [ ! -x "$VENV/bin/python" ] || ! cmp -s "$REQ" "$STAMP"; then
+    python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' \
+        || { echo "pse-a: potreban je Python 3.10 ili noviji" >&2; exit 1; }
+    echo "pse-a: pripremam okruzenje u $VENV (samo prvi put, treba internet) ..." >&2
+    mkdir -p "$(dirname "$VENV")"
+    python3 -m venv "$VENV"
+    "$VENV/bin/pip" install -q --disable-pip-version-check --upgrade pip
+    "$VENV/bin/pip" install -q --disable-pip-version-check -r "$REQ"
+    cp "$REQ" "$STAMP"
+    echo "pse-a: okruzenje spremno. Preporuka: pse-a doctor, pa pse-a selftest." >&2
+fi
+
+# fizicka jezgra, ne niti -- hyperthreading na GEMM-u steti (§1.1)
+if [ -z "$OMP_NUM_THREADS" ]; then
+    n=$(lscpu -p=Core,Socket 2>/dev/null | grep -v '^#' | sort -u | wc -l)
+    [ "$n" -gt 0 ] 2>/dev/null && OMP_NUM_THREADS=$n || OMP_NUM_THREADS=2
+    export OMP_NUM_THREADS
+fi
+
+PYTHONPATH="$LIB${PYTHONPATH:+:$PYTHONPATH}" exec "$VENV/bin/python" -m pse_a.cli "$@"

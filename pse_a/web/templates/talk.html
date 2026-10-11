@@ -1,0 +1,17 @@
+<h2>Razgovor</h2>
+{% if not active %}
+  <p class="muted small">Jezički model nije podešen. Rezultati i priče rade i bez njega.</p>
+  <button hx-get="/llm/setup" hx-target="#talk">Podesi model</button>
+{% else %}
+  <p class="muted small">{{ active_label }}{% if active_model %} · <code>{{ active_model }}</code>{% endif %}
+    · <a href="#" hx-get="/llm/setup" hx-target="#talk">promeni</a></p>
+  {% if online %}<p class="muted small">Spolja se šalju samo sažeci zapečaćenih rezultata — ne modeli, težine ni aktivacije.</p>{% endif %}
+  <div id="msgs" class="msgs">
+    {% for m in history %}{% include "msg.html" %}{% endfor %}
+  </div>
+  <form id="chatform" class="chatform">
+    <textarea name="text" rows="2" placeholder="Pitaj o rezultatima…" required></textarea>
+    <button>Pošalji</button>
+  </form>
+  <p id="thinking" class="htmx-indicator muted small">model razmišlja…</p>
+{% endif %}

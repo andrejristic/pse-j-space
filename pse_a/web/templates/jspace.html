@@ -1,0 +1,32 @@
+<header class="whead">
+  <h2>Mapa J-prostora</h2>
+  <p class="muted small">{{ m.model }} · {{ m.prompts|length }} namerno dvosmislenih promptova · {{ m.probes|length }} sondi</p>
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+<section class="card">
+  {{ chart|safe }}
+  <p class="small">
+  {% if m.regions.ignition is not none %}
+    Model se <strong>oštro opredeljuje na sloju {{ m.regions.ignition }}</strong>: pre toga zadržava više čitanja, posle bira jedno.
+  {% else %}
+    {% if m.regions.resolution_ok is defined and not m.regions.resolution_ok %}
+    <span class="warn">Oštro opredeljenje nije nađeno, ali mapa je gruba (svaki {{ m.regions.stride }}. sloj).</span> Skok od dva sloja se ovom rezolucijom ne vidi, pa ovo nije dokaz da ga nema — za odluku treba gušće uzorkovanje.
+    {% else %}
+    <span class="warn">Oštro opredeljenje nije nađeno.</span> Za ovaj model tro-delna struktura (čulni deo · radni prostor · izlaz) nije potvrđena — to je nalaz, ne kvar.
+    {% endif %}
+  {% endif %}
+  Osenčen pojas: očekivani udeo varijanse radnog prostora ({{ (100*m.expected_var[0])|round|int }}–{{ (100*m.expected_var[1])|round|int }} %).
+  </p>
+</section>
+<section class="card">
+  <strong>Pojmovi koje model drži — po sloju</strong>
+  <p class="muted small">Najveći nenegativni koeficijenti J-prostora za poslednji token prompta.</p>
+  {% for p in m.prompts %}{% set pi = loop.index0 %}
+  <details><summary>{{ p }}</summary>
+    {% for L in m.layers %}
+      <div class="row small"><span class="muted" style="min-width:52px">sloj {{ L }}</span>
+        <span class="chips">{% for w, c in m.chips[L|string][pi] %}<span class="chip" title="{{ '%.3f'|format(c) }}">{{ w }}</span>{% endfor %}</span></div>
+    {% endfor %}
+  </details>
+  {% endfor %}
+</section>

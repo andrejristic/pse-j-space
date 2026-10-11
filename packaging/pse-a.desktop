@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=PSE-A
+GenericName=Analizator lokalnih jezickih modela
+Comment=Spektralna anatomija GGUF modela, poredjenje preciznosti, dosijei
+Exec=pse-a gui
+Icon=applications-science
+Terminal=true
+Categories=Science;Development;

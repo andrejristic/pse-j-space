@@ -1,0 +1,15 @@
+<header class="whead">
+  <h2>Spektar i ponašanje</h2>
+  <p class="muted small">Perplexity svake prečke na istom tekstu ({{ rep.n_tokens }} tokena, {{ rep.eval }}) · referenca {{ rep.ref }}</p>
+  {% if not rep.kquant_clean %}<p class="warn small">Dimenzije ovog modela nisu deljive sa 256: prečke se razlikuju po sastavu tipova, ne samo po širini bita. Osa je „fajl", ne „broj bita".</p>{% endif %}
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+{% if chart %}<section class="card"><strong>Koliko su se pomerili glavni pravci, prema koliko je pogoršan izlaz</strong>{{ chart|safe }}</section>{% endif %}
+<section class="card"><div class="gridwrap"><table class="plain">
+  <thead><tr><th>fajl</th><th>MB</th><th>perplexity</th><th>pogoršanje</th><th>izgubljeno iz podprostora (m/4)</th><th>rel. greška težina</th></tr></thead>
+  <tbody>{% for r in rep.rows %}<tr><td class="nw"><code>{{ r.file }}</code></td><td>{{ (r.bytes/1e6)|round|int }}</td>
+    <td>{{ fmt(r.ppl, 3) }}</td><td>{{ fmt(r.ppl_rel, 2, True) }}</td>
+    <td>{{ fmt(1 - r.kept_quarter_mean, 4) if r.kept_quarter_mean is defined else '—' }}</td>
+    <td>{{ fmt(r.rel_rmse_mean, 3) if r.rel_rmse_mean is defined else '—' }}</td></tr>{% endfor %}</tbody>
+</table></div>
+<p class="muted small">„—": za taj par nema zapečaćenog poređenja preciznosti u ovoj biblioteci.</p></section>

@@ -1,0 +1,10 @@
+# Instalira se u korisnicki venv pri prvom pokretanju, NA MASINI GDE CE RADITI (§8).
+# pip wheel za numpy/scipy nosi OpenBLAS -- time se zaobilazi apt zamka sa
+# referentnim libblas3 (~60x sporije, potpuno tiho). pse-a doctor to i meri.
+numpy==2.5.3
+scipy==1.18.1
+fastapi==0.141.1
+uvicorn==0.53.0
+jinja2==3.1.6
+python-multipart==0.0.32
+anthropic==1.6.0

@@ -1,0 +1,13 @@
+<h2>Jezički model</h2>
+<p class="muted small">Bira se jednom; može se promeniti ili preskočiti. Ključ se čuva samo na ovoj mašini (~/.config/pse-a, pristup samo tebi).</p>
+<form hx-post="/llm/save" hx-target="#talk" class="setup">
+  <label>Provajder
+    <select name="pid" hx-get="/llm/fields" hx-target="#fields" hx-trigger="change, load" hx-include="this">
+      {% for grp, items in groups %}<optgroup label="{{ grp }}">
+        {% for pid, label in items %}<option value="{{ pid }}" {% if pid == current %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </optgroup>{% endfor %}
+    </select></label>
+  <div id="fields"></div>
+  <div class="row gap"><button>Sačuvaj</button>
+    <button type="button" hx-post="/llm/skip" hx-target="#talk">Preskoči za sada</button></div>
+</form>

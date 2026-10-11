@@ -1,0 +1,18 @@
+{% if kind == 'local_gguf' %}
+  <label>GGUF fajl (qwen2 instruct)
+    <input name="gguf" list="ggufs" value="{{ e.gguf or '' }}" placeholder="/putanja/do/modela.gguf"></label>
+  <datalist id="ggufs">{% for g in ggufs %}<option value="{{ g }}">{% endfor %}</datalist>
+  <p class="muted small">Radi bez interneta. Na slabijem procesoru je spor, ali ništa ne napušta mašinu.</p>
+{% else %}
+  {% if needs_key %}
+  <label>API ključ {% if keyurl %}<a class="small" href="{{ keyurl }}" target="_blank" rel="noopener">gde se dobija</a>{% endif %}
+    <input name="key" type="password" autocomplete="off" placeholder="{{ masked or 'nalepi ključ' }}"></label>
+  {% if env %}<p class="muted small">Ili postavi promenljivu okruženja <code>{{ env }}</code>.</p>{% endif %}
+  {% endif %}
+  {% if show_url %}<label>Adresa servera <input name="base_url" value="{{ e.base_url or '' }}" placeholder="https://…/v1"></label>{% endif %}
+  <label>Model
+    <select name="model" id="modelsel">{% if e.model %}<option selected>{{ e.model }}</option>{% endif %}
+      {% if kind == 'anthropic' and not e.model %}<option selected>claude-opus-5</option>{% endif %}</select></label>
+  <button type="button" hx-post="/llm/models" hx-target="#modelsel" hx-include="closest form">Učitaj modele sa servera</button>
+  {% if kind == 'anthropic' %}<p class="muted small">Podrazumevano claude-opus-5; ako bezbednosna provera odbije pitanje, API ga sam prosleđuje preporučenom modelu.</p>{% endif %}
+{% endif %}

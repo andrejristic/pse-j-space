@@ -1,0 +1,19 @@
+# Namerno dvosmisleni promptovi za detekciju ignition-a ([SPEC] Sec 7).
+# Svaki red: prompt ciji poslednji token dopusta vise citanja; kontekst pre njega
+# ne presudjuje. Ignition = sloj na kome model OSTRO izabere jedno citanje.
+# Pisano za engleski jer 0.5B i 7B Qwen najjace citaju engleski.
+She sat down by the bank and
+He picked up the bat and
+The pitcher was full, so she
+They walked toward the light and
+I saw her duck, so I
+The seal on the document was
+He could not bear the
+She went to the club to
+The crane flew over the
+They left the match because
+The spring was broken, so the
+He read the lead story about
+The date was ripe, so she
+We need a new tank for the
+The bow was tied, and then he

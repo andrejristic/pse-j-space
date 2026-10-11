@@ -1,0 +1,28 @@
+<header class="whead">
+  <h2>Rečnik pojmova (sloj {{ rep.layer }})</h2>
+  <p class="muted small">{{ rep.model }} · {{ rep.n_features }} pojmova nad d_model {{ rep.d_model }} · {{ rep.n_tokens }} pozicija · korpus: {{ rep.corpus }}</p>
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+<section class="card">
+  <dl class="kv small">
+    <dt>rekonstrukcija (FVU)</dt><dd>{{ fmt(rep.fvu, 3) }} <span class="muted">prijem ≤ {{ rep.fvu_max }}</span></dd>
+    <dt>aktivnih po poziciji (L0)</dt><dd>{{ fmt(rep.l0, 1) }} <span class="muted">opseg {{ rep.l0_target[0] }}–{{ rep.l0_target[1] }}</span></dd>
+    <dt>mrtvih pojmova</dt><dd>{{ fmt(100*rep.dead_frac, 1) }} %</dd>
+    <dt>efektivan broj pojmova</dt><dd>{{ fmt(rep.superposition_profile.n_eff, 0) }} od {{ rep.superposition_profile.n_alive }} živih</dd>
+    <dt>stabilni (ne dele pozicije sa drugima više od slučaja)</dt><dd>{{ rep.superposition_profile.n_stable }}
+      {% if rep.superposition_profile.n_evaluable is defined %}<span class="muted">od {{ rep.superposition_profile.n_evaluable }} koji imaju dovoljno podataka za ocenu</span>{% endif %}</dd>
+  </dl>
+  {% if rep.profile == 'dev' %}<p class="warn small">Razvojni profil: malo podataka, rečnik služi proveri toka, ne tumačenju pojmova.</p>{% endif %}
+</section>
+<section class="card">
+  <strong>Najčešći pojmovi — gde se najjače pale</strong>
+  {% for c in rep.cards[:40] %}
+  <details><summary><code>#{{ c.feature }}</code> <span class="muted small">pali se na {{ fmt(100*c.freq, 2) }} % pozicija{% if c.stable %} · stabilan{% endif %}</span></summary>
+    {% for e in c.examples %}
+      <div class="small" style="font-family:ui-monospace,monospace;margin:2px 0">
+      {% for t in e.ctx %}{% if loop.index0 == e.at %}<mark>{{ t }}</mark>{% else %}{{ t }}{% endif %}{% endfor %}
+      <span class="muted"> · {{ fmt(e.act, 2) }}</span></div>
+    {% endfor %}
+  </details>
+  {% endfor %}
+</section>

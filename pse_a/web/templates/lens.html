@@ -1,0 +1,22 @@
+<header class="whead">
+  <h2>Misao po slojevima (logit lens)</h2>
+  <p class="muted small">{{ rep.model }} · u svakoj ćeliji: reč koju bi model izgovorio da mora da progovori na tom sloju; boja = sigurnost.</p>
+  <p class="warn small">Ovo je jeftina aproksimacija: čita samo ono što je već izgovorljivo i potcenjuje računanje koje još nije u rečima. Mapa J-prostora postoji da zatvori taj jaz.</p>
+</header>
+{% if story %}<section class="card story"><strong>Ukratko</strong>{% for s in story %}<p class="small">{{ s }}</p>{% endfor %}<p class="muted small">Oznake u zagradama su početak heša artefakta iz kog tvrdnja dolazi.</p></section>{% endif %}
+{% for it in rep["items"] %}
+<details class="card" {% if loop.first %}open{% endif %}>
+  <summary><strong>{{ it.prompt }}</strong> <span class="muted small">→ „{{ it.top[-1][-1][0] }}", opredeljen na sloju {{ it.commit_layer }}</span></summary>
+  <div class="gridwrap"><table class="wf">
+    <thead><tr><th>sloj</th>{% for tk in it.tokens %}<th>{{ tk }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for L in it.layers %}{% set li = loop.index0 %}
+      <tr class="{{ 'commit' if L == it.commit_layer else '' }}"><th>{{ L }}</th>
+      {% for pos in range(it.tokens|length) %}{% set p = it.p[li][pos] %}
+        <td style="background:color-mix(in oklab,var(--accent) {{ (p*70)|round|int }}%,transparent)"
+            title="{{ it.top[li][pos]|join(' · ') }}  ({{ '%.2f'|format(p) }})">{{ it.top[li][pos][0] }}</td>
+      {% endfor %}</tr>
+    {% endfor %}
+    </tbody></table></div>
+</details>
+{% endfor %}
