@@ -17,6 +17,8 @@ done
 install -m 0644 "$HERE/packaging/requirements.txt" "$STAGE/usr/lib/pse-a/requirements.txt"
 install -m 0755 "$HERE/packaging/pse-a" "$STAGE/usr/bin/pse-a"
 install -m 0644 "$HERE/packaging/pse-a.desktop" "$STAGE/usr/share/applications/pse-a.desktop"
+install -m 0644 "$HERE/LICENSE" "$STAGE/usr/share/doc/pse-a/LICENSE"
+install -m 0644 "$HERE/NOTICE" "$STAGE/usr/share/doc/pse-a/NOTICE"
 for d in PSE-A_MASTER_ALGORITHM.docx PSE-A_PLAN.docx PSE-A_DOWNLOAD_LINKS.docx PSE-A_UPUTSTVO.docx; do
     [ -f "$HERE/$d" ] && install -m 0644 "$HERE/$d" "$STAGE/usr/share/doc/pse-a/$d"
 done
